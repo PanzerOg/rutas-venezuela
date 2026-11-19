@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16.4-alpine
+    container_name: rutas_venezuela_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: America/Caracas
+      PGTZ: America/Caracas
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/01_ddl:/docker-entrypoint-initdb.d/01_ddl
+      - ./database/02_security:/docker-entrypoint-initdb.d/02_security
+      - ./database/03_logic:/docker-entrypoint-initdb.d/03_logic
+      - ./database/04_seeds:/docker-entrypoint-initdb.d/04_seeds
+
+volumes:
+  postgres_data:
