@@ -10,8 +10,8 @@ Para evitar el problema de _"en mi máquina sí funciona y en la de mis compañe
 
 1. **Motor idéntico (`docker-compose.yml`):** Descarga automáticamente la imagen oficial `postgres:16.4-alpine` configurada con zona horaria `America/Caracas` y codificación `UTF-8`.
 2. **Credenciales unificadas (`.env`):** Todos los integrantes usan el mismo usuario, contraseña, puerto y nombre de base de datos a partir de `.env.example`, evitando fallos de conexión en el backend o en pgAdmin.
-3. **Automatización de scripts (`database/`):** Cada vez que la base de datos se crea desde cero, PostgreSQL ejecuta automáticamente todos los archivos `.sql` dentro de `database/` en estricto orden alfabético por carpeta:
-   - `01_ddl/` → Creación y modificación de tablas (`DROP`, `CREATE`, `ALTER`) usando tipos de datos primitivos estándar (sin extensiones espaciales).
+3. **Automatización de scripts (`database/` + `00_init.sh`):** Cada vez que la base de datos se crea desde cero, el script [`database/00_init.sh`](./database/00_init.sh) recorre las subcarpetas de `database/` y ejecuta automáticamente todos los archivos `.sql` en estricto orden alfabético por carpeta:
+   - `01_ddl/` → Creación y modificación de tablas (`DROP`, `CREATE`, `ALTER`), vistas e índices usando tipos de datos primitivos estándar (sin extensiones espaciales).
    - `02_security/` → Roles, cuentas de usuario y permisos (`GRANT` / `REVOKE`).
    - `03_logic/` → Reglas de integridad automatizadas: triggers, funciones y procedimientos almacenados en PL/pgSQL.
    - `04_seeds/` → Carga inicial (`INSERT`) de datos realistas del contexto turístico venezolano.
@@ -132,3 +132,12 @@ docker compose down -v && docker compose up -d
 - **Apagar la base de datos al terminar el día (sin borrar datos):** `docker compose stop`
 - **Volver a encenderla al día siguiente:** `docker compose start`
 - **Ver errores si algún script SQL falla al arrancar:** `docker compose logs db`
+
+---
+
+## 6. Documentación de Fase 1 y Acceso MCP Local
+
+- **Diagrama ERE corregido:** [`docs/ER_RutasVenezuela_Corregido.drawio`](./docs/ER_RutasVenezuela_Corregido.drawio)
+- **Modelo Relacional y Restricciones LPO:** [`docs/01_modelo_relacional_y_correcciones_er.md`](./docs/01_modelo_relacional_y_correcciones_er.md)
+- **Plan de Trabajo Paralelo (3 integrantes):** [`docs/02_plan_equipo_segunda_entrega.md`](./docs/02_plan_equipo_segunda_entrega.md)
+- **Servidor MCP local para PostgreSQL:** [`tools/postgres_mcp_server.py`](./tools/postgres_mcp_server.py) y plantilla [`mcp_config.example.json`](./mcp_config.example.json) (solo lectura por defecto mediante `MCP_ALLOW_WRITE=false`; expone `pg_query`, `pg_list_tables`, `pg_describe_table` y `pg_list_routines`).
