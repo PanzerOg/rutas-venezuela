@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "rutas-venezuela-postgres": {
+      "command": "python",
+      "args": [
+        "d:\\Contenido para la Segunda Entrega Bases de Datos\\rutas-venezuela\\tools\\postgres_mcp_server.py"
+      ],
+      "env": {
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_DB": "rutas_venezuela_db",
+        "POSTGRES_USER": "admin_rutas",
+        "POSTGRES_PASSWORD": "rutas_dev_password_2026",
+        "MCP_ALLOW_WRITE": "false"
+      }
+    }
+  }
+}

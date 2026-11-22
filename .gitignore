@@ -4,3 +4,8 @@ postgres_data/
 Thumbs.db
 node_modules/
 __pycache__/
+.venv/
+.tmp/
+*.pyc
+pyrefly.toml
+.vscode/
