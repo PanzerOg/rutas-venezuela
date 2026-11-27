@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Módulo 3 · Autor responsable: Leonardo Enrique Chacón Agraz - C.I. 31.895.402 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="observatorio_incidencias" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="792" leftMargin="25" rightMargin="25" topMargin="24" bottomMargin="22"
+              whenNoDataType="NoDataSection">
+  <style name="Title" forecolor="#163C43" fontSize="24" isBold="true" fontName="DejaVu Sans"/>
+  <style name="Muted" forecolor="#35595C" fontSize="9" fontName="DejaVu Sans" vTextAlign="Middle"/>
+  <style name="Stat" forecolor="#163C43" fontSize="21" fontName="DejaVu Sans" isBold="true" vTextAlign="Middle"/>
+  <style name="Header" mode="Opaque" backcolor="#163C43" forecolor="#FFFFFF" fontSize="9"
+         isBold="true" fontName="DejaVu Sans" vTextAlign="Middle">
+    <box leftPadding="5" rightPadding="3"/>
+  </style>
+  <style name="Cell" forecolor="#163C43" fontSize="9" fontName="DejaVu Sans" vTextAlign="Middle">
+    <box leftPadding="5" rightPadding="3">
+      <bottomPen lineWidth="0.4" lineColor="#CBD8D3"/>
+    </box>
+    <conditionalStyle>
+      <conditionExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></conditionExpression>
+      <style mode="Opaque" backcolor="#EEF2EE"/>
+    </conditionalStyle>
+  </style>
+  <parameter name="ESTADO" class="java.lang.String"/>
+  <parameter name="SEVERIDAD" class="java.lang.String"/>
+  <parameter name="TIPO_ELEMENTO" class="java.lang.String"/>
+  <parameter name="DESDE" class="java.sql.Date"/>
+  <parameter name="HASTA" class="java.sql.Date"/>
+  <queryString language="SQL"><![CDATA[
+    SELECT nro_reporte, fecha_hora_deteccion, elemento, id_reportante,
+           CASE WHEN severidad = 'Critico' THEN 'Crítico' ELSE severidad END AS severidad,
+           fecha_limite, estado_efectivo, ente_confirma, ente_cierra,
+           COUNT(*) FILTER (WHERE estado_efectivo = 'Activo') OVER () AS activas,
+           ROUND(100.0 * COUNT(*) FILTER (WHERE severidad = 'Critico') OVER () / COUNT(*) OVER (), 2) AS porcentaje_criticas,
+           COUNT(*) FILTER (WHERE prorroga_activa) OVER () AS prorrogas_activas,
+           ROUND(AVG(horas_confirmacion) OVER (), 2) AS horas_promedio_confirmacion,
+           ROUND(AVG(horas_cierre) OVER (), 2) AS horas_promedio_cierre
+    FROM VW_M3_OBSERVATORIO
+    WHERE (CAST($P{ESTADO} AS TEXT) IS NULL OR estado_efectivo = $P{ESTADO})
+      AND (CAST($P{SEVERIDAD} AS TEXT) IS NULL OR severidad = $P{SEVERIDAD})
+      AND (CAST($P{TIPO_ELEMENTO} AS TEXT) IS NULL OR tipo_elemento = $P{TIPO_ELEMENTO})
+      AND (CAST($P{DESDE} AS DATE) IS NULL OR fecha_hora_deteccion >= $P{DESDE})
+      AND (CAST($P{HASTA} AS DATE) IS NULL OR fecha_hora_deteccion < CAST($P{HASTA} AS DATE) + 1)
+    ORDER BY fecha_hora_deteccion DESC, nro_reporte DESC
+  ]]></queryString>
+  <field name="nro_reporte" class="java.lang.Integer"/>
+  <field name="fecha_hora_deteccion" class="java.sql.Timestamp"/>
+  <field name="elemento" class="java.lang.String"/>
+  <field name="id_reportante" class="java.lang.Integer"/>
+  <field name="severidad" class="java.lang.String"/>
+  <field name="fecha_limite" class="java.sql.Date"/>
+  <field name="estado_efectivo" class="java.lang.String"/>
+  <field name="ente_confirma" class="java.lang.String"/>
+  <field name="ente_cierra" class="java.lang.String"/>
+  <field name="activas" class="java.lang.Long"/>
+  <field name="porcentaje_criticas" class="java.math.BigDecimal"/>
+  <field name="prorrogas_activas" class="java.lang.Long"/>
+  <field name="horas_promedio_confirmacion" class="java.math.BigDecimal"/>
+  <field name="horas_promedio_cierre" class="java.math.BigDecimal"/>
+  <title>
+    <band height="123">
+      <staticText>
+        <reportElement style="Title" x="0" y="0" width="792" height="32"/>
+        <text><![CDATA[Observatorio de severidad de incidencias]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Muted" x="0" y="34" width="792" height="15"/>
+        <text><![CDATA[Rutas Venezuela · Gestión institucional]]></text>
+      </staticText>
+      <line><reportElement x="0" y="56" width="792" height="1"/><graphicElement><pen lineColor="#CBD8D3"/></graphicElement></line>
+      <textField evaluationTime="Report">
+        <reportElement style="Stat" x="0" y="64" width="150" height="28"/>
+        <textFieldExpression><![CDATA[$F{activas} == null ? "—" : $F{activas}.toString()]]></textFieldExpression>
+      </textField>
+      <staticText>
+        <reportElement style="Muted" x="0" y="93" width="156" height="22"/>
+        <text><![CDATA[Incidencias activas]]></text>
+      </staticText>
+      <textField evaluationTime="Report">
+        <reportElement style="Stat" x="158" y="64" width="150" height="28"/>
+        <textFieldExpression><![CDATA[$F{porcentaje_criticas} == null ? "—" : $F{porcentaje_criticas}.toString() + "%"]]></textFieldExpression>
+      </textField>
+      <staticText>
+        <reportElement style="Muted" x="158" y="93" width="156" height="22"/>
+        <text><![CDATA[Incidencias críticas]]></text>
+      </staticText>
+      <textField evaluationTime="Report">
+        <reportElement style="Stat" x="316" y="64" width="150" height="28"/>
+        <textFieldExpression><![CDATA[$F{prorrogas_activas} == null ? "—" : $F{prorrogas_activas}.toString()]]></textFieldExpression>
+      </textField>
+      <staticText>
+        <reportElement style="Muted" x="316" y="93" width="156" height="22"/>
+        <text><![CDATA[Prórrogas vigentes]]></text>
+      </staticText>
+      <textField evaluationTime="Report">
+        <reportElement style="Stat" x="474" y="64" width="150" height="28"/>
+        <textFieldExpression><![CDATA[$F{horas_promedio_confirmacion} == null ? "—" : $F{horas_promedio_confirmacion}.toString()]]></textFieldExpression>
+      </textField>
+      <staticText>
+        <reportElement style="Muted" x="474" y="93" width="156" height="22"/>
+        <text><![CDATA[Horas promedio de confirmación]]></text>
+      </staticText>
+      <textField evaluationTime="Report">
+        <reportElement style="Stat" x="632" y="64" width="150" height="28"/>
+        <textFieldExpression><![CDATA[$F{horas_promedio_cierre} == null ? "—" : $F{horas_promedio_cierre}.toString()]]></textFieldExpression>
+      </textField>
+      <staticText>
+        <reportElement style="Muted" x="632" y="93" width="156" height="22"/>
+        <text><![CDATA[Horas promedio de cierre]]></text>
+      </staticText>
+    </band>
+  </title>
+  <columnHeader>
+    <band height="24">
+      <staticText>
+        <reportElement style="Header" x="0" y="0" width="56" height="24"/>
+        <text><![CDATA[Reporte]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="56" y="0" width="95" height="24"/>
+        <text><![CDATA[Detectado]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="151" y="0" width="140" height="24"/>
+        <text><![CDATA[Elemento afectado]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="291" y="0" width="62" height="24"/>
+        <text><![CDATA[ID emisor]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="353" y="0" width="66" height="24"/>
+        <text><![CDATA[Severidad]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="419" y="0" width="75" height="24"/>
+        <text><![CDATA[Fecha límite]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="494" y="0" width="78" height="24"/>
+        <text><![CDATA[Estado]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="572" y="0" width="110" height="24"/>
+        <text><![CDATA[Ente que confirma]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Header" x="682" y="0" width="110" height="24"/>
+        <text><![CDATA[Ente que cierra]]></text>
+      </staticText>
+    </band>
+  </columnHeader>
+  <detail>
+    <band height="30" splitType="Prevent">
+      <textField isBlankWhenNull="true">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="0" y="0" width="56" height="30"/>
+        <textFieldExpression><![CDATA[$F{nro_reporte}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true" pattern="dd/MM/yyyy HH:mm">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="56" y="0" width="95" height="30"/>
+        <textFieldExpression><![CDATA[$F{fecha_hora_deteccion}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true" textAdjust="StretchHeight">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="151" y="0" width="140" height="30"/>
+        <textFieldExpression><![CDATA[$F{elemento}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="291" y="0" width="62" height="30"/>
+        <textFieldExpression><![CDATA[$F{id_reportante}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="353" y="0" width="66" height="30"/>
+        <textFieldExpression><![CDATA[$F{severidad}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true" pattern="dd/MM/yyyy">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="419" y="0" width="75" height="30"/>
+        <textFieldExpression><![CDATA[$F{fecha_limite}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="494" y="0" width="78" height="30"/>
+        <textFieldExpression><![CDATA[$F{estado_efectivo}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true" textAdjust="StretchHeight">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="572" y="0" width="110" height="30"/>
+        <textFieldExpression><![CDATA[$F{ente_confirma}]]></textFieldExpression>
+      </textField>
+      <textField isBlankWhenNull="true" textAdjust="StretchHeight">
+        <reportElement style="Cell" stretchType="ContainerHeight" x="682" y="0" width="110" height="30"/>
+        <textFieldExpression><![CDATA[$F{ente_cierra}]]></textFieldExpression>
+      </textField>
+    </band>
+  </detail>
+  <pageFooter>
+    <band height="18">
+      <textField>
+        <reportElement style="Muted" x="0" y="2" width="792" height="15"/>
+        <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+      </textField>
+    </band>
+  </pageFooter>
+  <noData>
+    <band height="78">
+      <staticText>
+        <reportElement style="Title" x="0" y="0" width="792" height="32"/>
+        <text><![CDATA[Observatorio de severidad de incidencias]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Muted" x="0" y="44" width="792" height="16"/>
+        <text><![CDATA[No hay incidencias para los filtros seleccionados.]]></text>
+      </staticText>
+    </band>
+  </noData>
+</jasperReport>

@@ -140,4 +140,5 @@ docker compose down -v && docker compose up -d
 - **Diagrama ERE corregido:** [`docs/ER_RutasVenezuela_Corregido.drawio`](./docs/ER_RutasVenezuela_Corregido.drawio)
 - **Modelo Relacional y Restricciones LPO:** [`docs/01_modelo_relacional_y_correcciones_er.md`](./docs/01_modelo_relacional_y_correcciones_er.md)
 - **Plan de Trabajo Paralelo (3 integrantes):** [`docs/02_plan_equipo_segunda_entrega.md`](./docs/02_plan_equipo_segunda_entrega.md)
+- **Módulo 3 · Arranque, perfiles de prueba e integración:** [`docs/03_m3_integracion.md`](./docs/03_m3_integracion.md)
 - **Servidor MCP local para PostgreSQL:** [`tools/postgres_mcp_server.py`](./tools/postgres_mcp_server.py) y plantilla [`mcp_config.example.json`](./mcp_config.example.json) (solo lectura por defecto mediante `MCP_ALLOW_WRITE=false`; expone `pg_query`, `pg_list_tables`, `pg_describe_table` y `pg_list_routines`).

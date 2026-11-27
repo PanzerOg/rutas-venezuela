@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- Módulo 3 · Autor responsable: Leonardo Enrique Chacón Agraz - C.I. 31.895.402 -->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestión de servicios e incidencias | Rutas Venezuela</title>
+  <link rel="stylesheet" href="/css/m3.css">
+  <script type="module" src="/js/modules/m3_transacciones.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="wordmark" href="/modulo-3/">Rutas Venezuela</a>
+    <div id="session" class="session" hidden>
+      <span id="user"></span>
+      <button id="logout" class="outline" type="button">Cerrar sesión</button>
+    </div>
+  </header>
+  <main class="layout">
+    <section id="login" class="welcome" aria-labelledby="login-title">
+      <div class="welcome-intro">
+        <h1>Gestión de servicios e incidencias</h1>
+        <p>Accede para consultar experiencias, gestionar credenciales y hacer seguimiento a reportes en ruta.</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <h2 id="login-title">Iniciar sesión</h2>
+        <label>Perfil
+          <select name="tipo_actor" id="actor-type">
+            <option value="Visitante">Visitante</option>
+            <option value="Guia">Guía turístico</option>
+            <option value="Comercio">Comercio aliado</option>
+            <option value="Ente">Ente público</option>
+          </select>
+        </label>
+        <label><span id="identifier-label">Número de documento</span>
+          <input name="identificador" type="text" required maxlength="40" autocomplete="username">
+        </label>
+        <label id="document-label">Tipo de documento
+          <select name="documento"><option value="Cedula">Cédula</option><option value="Pasaporte">Pasaporte</option></select>
+        </label>
+        <label id="license-label" hidden>Código de licencia
+          <input name="licencia" type="text" maxlength="40">
+        </label>
+        <label>Contraseña
+          <input name="contrasena" type="password" required maxlength="128" autocomplete="current-password">
+        </label>
+        <p id="login-status" class="feedback" role="status"></p>
+        <button type="submit">Entrar</button>
+      </form>
+    </section>
+    <section id="workspace" hidden>
+      <nav id="sections" class="sections" aria-label="Secciones del módulo"></nav>
+      <div class="section-header">
+        <div>
+          <h1 id="section-title"></h1>
+          <p id="section-caption"></p>
+        </div>
+        <div id="section-actions" class="actions"></div>
+      </div>
+      <div id="indicators" class="indicators" hidden></div>
+      <form id="filters" class="filters" aria-label="Filtros"></form>
+      <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+      <div class="table-frame" id="results"></div>
+      <div id="pagination" class="pagination"></div>
+    </section>
+  </main>
+  <dialog id="dialog" aria-labelledby="dialog-title">
+    <form id="editor">
+      <header class="dialog-header">
+        <h2 id="dialog-title" tabindex="-1"></h2>
+        <button id="close-dialog" class="outline" type="button">Cerrar</button>
+      </header>
+      <div id="dialog-body" class="dialog-body"></div>
+      <p id="dialog-feedback" class="feedback" role="status"></p>
+      <footer id="dialog-actions" class="actions"></footer>
+    </form>
+  </dialog>
+</body>
+</html>
